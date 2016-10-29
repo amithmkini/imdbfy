@@ -45,7 +45,7 @@ def getUrl():
         return req_url
 
 def getPage():
-    lst = []
+    dic = {}
     movie_url = getUrl()
     if movie_url == None:
         return url
