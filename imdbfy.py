@@ -7,15 +7,15 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("-a", "--actors", help = "Lead actor and Actress",
                     action = "store_true")
-parser.add_argument("-c", "--cast", help = "Shows the entire cast",
+parser.add_argument("-d", "--duration", help = "Duration of the movie",
                     action = "store_true")
-parser.add_argument("-d", "--duration", help = "Director of the movie",
+parser.add_argument("-D", "--director", help = "Director of the movie",
                     action = "store_true")
 parser.add_argument("-H", "--history",
                     help = "History of previous searches by the user",
                     action = "store_true")
 parser.add_argument("-o", "--overview",
-                    help = "Overview (Actor, Actress, Ratings, Director, and Plot)",
+                    help = "Overview (Actor, Ratings, Director, and Plot)",
                     action = "store_true")
 parser.add_argument("-p", "--poster", help = "Download the poster",
                     action = "store_true")
@@ -48,7 +48,7 @@ def getPage():
     dic = {}
     movie_url = getUrl()
     if movie_url == None:
-        return url
+        return movie_url
     else:
         new_req = requests.get(movie_url)
         new_soup = bs(new_req.text,'html.parser')
@@ -61,4 +61,12 @@ def getPage():
         dic['Year'] = int(yr[0])
         titlis.remove('('+yr[0]+')')
         dic['Title'] = str(' '.join(titlis))
+        dic['Rating'] = float(new_soup(itemprop="ratingValue")[0].text)
+        text = new_soup(property="og:description")[0]['content']
+        dic['Director'] = text.split('.')[0].replace('Directed by ','')
+        dic['Actors'] = text.split('.')[1].replace('  With ','')
+        sum_plot = new_soup(itemprop="description")
+        dic['Summary'] = sum_plot[0].text.lstrip().rstrip()
+        dic['Plot'] = sum_plot[1].text.lstrip().rstrip()
+        dic['Duration'] = new_soup(itemprop="duration")[0].text.lstrip().rstrip()
         return dic
